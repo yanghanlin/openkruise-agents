@@ -114,7 +114,7 @@ fi
 
 # Run pytest with serial execution (no parallel flag)
 cd "$PROJECT_ROOT"
-pytest -v -s -x --tb=short "$TEST_DIR"
+pytest -v -s --tb=short "$TEST_DIR"
 retVal=$?
 
 set +x
