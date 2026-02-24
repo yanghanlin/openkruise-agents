@@ -13,7 +13,7 @@ spec:
         - name: runtime
           image: ${RUNTIME_IMAGE}
           imagePullPolicy: IfNotPresent
-          command: [ "sh", "/workspace/entrypoint.sh" ]
+          command: [ "sh", "${RUNTIME_ENTRYPOINT}" ]
           volumeMounts:
             - name: envd-volume
               mountPath: /mnt/envd

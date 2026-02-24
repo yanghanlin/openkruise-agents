@@ -19,6 +19,7 @@ set -e
 TIMEOUT="60m"
 RUNTIME_IMAGE="agent-runtime:latest"
 CODE_INTERPRETER_IMAGE="registry-ap-southeast-1.ack.aliyuncs.com/acs/code-interpreter:v1.6"
+RUNTIME_ENTRYPOINT="/workspace/entrypoint.sh"
 
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -54,9 +55,14 @@ while [[ $# -gt 0 ]]; do
             shift # past argument
             shift # past value
             ;;
+        --runtime-entrypoint)
+            RUNTIME_ENTRYPOINT="$2"
+            shift # past argument
+            shift # past value
+            ;;
         *)
             echo "Unknown parameter passed: $1"
-            echo "Usage: $0 [--e2b-version VERSION] [--sdk-version VERSION] [--timeout TIMEOUT] [--runtime-image IMAGE] [--code-interpreter-image IMAGE]"
+            echo "Usage: $0 [--e2b-version VERSION] [--sdk-version VERSION] [--timeout TIMEOUT] [--runtime-image IMAGE] [--code-interpreter-image IMAGE] [--runtime-entrypoint ENTRYPOINT]"
             exit 1
             ;;
     esac
@@ -100,7 +106,7 @@ if kubectl get sandboxset code-interpreter -n default &>/dev/null; then
     echo "SandboxSet 'code-interpreter' already exists, skipping creation"
 else
     echo "Creating code-interpreter sandboxset..."
-    sed "s|\${RUNTIME_IMAGE}|${RUNTIME_IMAGE}|g; s|\${CODE_INTERPRETER_IMAGE}|${CODE_INTERPRETER_IMAGE}|g" \
+    sed "s|\${RUNTIME_IMAGE}|${RUNTIME_IMAGE}|g; s|\${CODE_INTERPRETER_IMAGE}|${CODE_INTERPRETER_IMAGE}|g; s|\${RUNTIME_ENTRYPOINT}|${RUNTIME_ENTRYPOINT}|g" \
         "$TEST_DIR/assets/sandboxset-code-interpreter.yaml" | kubectl apply -f -
     echo "wait 5 seconds before test start"
     sleep 5
